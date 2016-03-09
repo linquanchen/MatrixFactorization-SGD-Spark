@@ -51,6 +51,17 @@ python rmse.py w.csv h.csv ratings_1M.csv
 
  **PS: You need to get the output file from HDFS**
  
+## Algorithms
+As shown in Figure 1, I updated the blocks in the diagonal order, which means that I updated the block 1(red), block 2(yellow), block 3(black) and block 4(green) at same time respectively. We can know from the figure 1, every color blocks correspond to different parts of H and W blocks, therefore we can update the H and W matrices parallel and not affect each other.![dada](https://raw.githubusercontent.com/linquanchen/MatrixFactorization-SGD-Spark/master/update-blocks-in-diagonal.png)
+**Figure 1. Updating blocks in diagonal**
+
+For more details about the algorithms and the optimization, please see the [document](MatrixFactorization-SGD-Spark/Explore and Optimize Matrix Factorization with Spark_Linquan_Chen.pdf).
+
+## Future Plan
+The most challenge of my program is about memory. I think there are two steps to solve the problem: 
+
+* Firstly, I need to optimize my program. Because, I have created many large RDDs during the iterative processes. I need to discard them when no longer need them. Therefore, I need to re-analyze the process and optimize the memory utilization. 
+* Secondly, I can optimize the program at the aspect of tuning Spark Configuration parameters, such as cluster instance type and number, executor memory and number, driver memory and number, memory fraction and so on.
 
 
 
