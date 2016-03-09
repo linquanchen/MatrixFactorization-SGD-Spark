@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+
+# Author: Linquan Chen
+# E-mail: linquanc@andrew.cmu.edu
+# Updated: 09/03/2016 17:00:00
+
+# exmaple command to run:
+# spark-submit --master yarn --executor-memory 10G mf.py ratings_1M.csv 30 w.csv h.csv
+
 import sys
 import numpy as np
 import random
