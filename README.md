@@ -20,25 +20,34 @@ wget http://files.grouplens.org/datasets/movielens/ml-latest.zip
 unzip ml-1m.zip ; cut -d':' -f1,3,5 ml-1m/ratings.dat | sed 's/:/,/g' > ratings_1M.csv
 10M:
 unzip ml-10m.zip ; cut -d':' -f1,3,5 ml-10M100K/ratings.dat | sed 's/:/,/g' > ratings_10M.csv
+5M:
+head -n 5000000 ratings_10M.csv > ratings_5M.csv
 22M:
 unzip ml-latest.zip ; cut -d',' -f1,2,3 ml-latest/ratings.csv > ratings_22M.csv
 ```
 
 ## Cluster
 * create cluster: You can use the EMR of Amazon Web Service to create a Spark cluster with one master and two slaves, choose the instance type: **c4.xlarge**
-*  upload file: upload the **my.py** and **xxx.csv** into master node
+*  upload file: upload the **spark-matrix-factorization_2.10-1.0.jar**, **my.py** and **xxx.csv** into master node
 *  put data file to HDFS: such as ```hadoop fs -put xxx.csv```
 
 ## How to Run
-* Run the program 
+* Run the program(**PySpark**)
 ```
 [time] spark-submit --master yarn [--spark-config-params] mf.py {dataset-location} {rank} {output-location-w} {output-location-h}
 ```
 For example:
 ```
-time spark-submit --executor-memory 10G mf.py ratings_1M.csv 30 w.csv h.csv
+time spark-submit --master yarn mf.py ratings_1M.csv 30 w.csv h.csv
 ```
-
+* Run the program(**Scala**)
+```
+[time] spark-submit --master yarn [--spark-config-params] --class "SparkMatrixFactorization" spark-matrix-factorization_2.10-1.0.jar {dataset-location} {rank} {output-location-w} {output-location-h}
+```
+For example:
+```
+time spark-submit --master yarn --class "SparkMatrixFactorization" spark-matrix-factorization_2.10-1.0.jar ratings_1M.csv 30 w.csv h.csv
+```
 * Calculate the RMSE
 ```
 python rmse.py {w-location} {h-location} {data-location}
