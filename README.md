@@ -1,6 +1,9 @@
-# MatrixFactorization-SGD-Spark
+# MatrixFactorization-Spark-Scala
 
-Spark is an efficient, general-purpose programming language to be used interactively to process large datasets on a cluster. This project focuses on using Apache Spark Programming Framework to optimize the sequential matrix factorization using Stochastic Gradient Descent(SGD) algorithm. Based on the sequential program(**oos-sgd-mf.py**), I implemented a basic program using spark and analyzed the disadvantages of this version(***mf.py***). Then, I optimize the program using parallel updating the blocks, partition and group the blocks, and also tuning the spark configuration parameters to improve the performance.
+Spark is an efficient, general-purpose programming language to be used interactively to process large datasets on a cluster. This project focuses on using Apache Spark Programming Framework to optimize the sequential matrix factorization using Stochastic Gradient Descent(SGD) algorithm. Based on the sequential program(**oos-sgd-mf.py**), I implemented a basic program using spark and analyzed the disadvantages of this version(***mf.py***). Also, we implemented a scala version of the same algorithms(**SparkMatrixFactorization.scala**). Then, I optimize the program using parallel updating the blocks, partition and group the blocks, and also tuning the spark configuration parameters to improve the performance.
+
+* **PySpark**: mf.py
+* **Scala**: SparkMatrixFactorization.scala
 
 ## Data
 * Download data: Read the usage license at [grouplens](http://grouplens.org/datasets/movielens) to better understand the limitations on use of this data.
@@ -66,7 +69,7 @@ As shown in Figure 1, I updated the blocks in the diagonal order, which means th
 ![dada](https://raw.githubusercontent.com/linquanchen/MatrixFactorization-SGD-Spark/master/img/update-blocks-in-diagonal.png)
 **Figure 1. Updating blocks in diagonal**
 
-For more details about the algorithms and the optimization, please see the [document!](Explore and Optimize Matrix Factorization with Spark_Linquan_Chen.pdf).
+For more details about the algorithms and the optimization, please see the [document!](doc/Team004_18645TermProject_FinalReport.pdf).
 
 ## Future Plan
 The most challenge of my program is about memory. I think there are two steps to solve the problem: 
