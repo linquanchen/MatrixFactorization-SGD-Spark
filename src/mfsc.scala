@@ -1,4 +1,16 @@
 
+/**
+ * SparkMatrixFactorization.scala - Matrix Factorization using Apache Spark Programming 
+ * Usage: [time] spark-submit --master yarn [--spark-config-params] --class "SparkMatrixFactorization" 
+ *         spark-matrix-factorization_2.10-1.0.jar {dataset-location} {rank} {output-location-w} {output-location-h}
+ *
+ * Example: time spark-submit --master yarn  --class "SparkMatrixFactorization" 
+ *          spark-matrix-factorization_2.10-1.0.jar ratings_1M.csv 30 w.csv h.csv
+ *
+ * Author: Linquan Chen <linquanc@andrew.cmu.edu>
+ * Author: Yuankun Chang <yuankunc@andrew.cmu.edu>
+ * Updated: 27/04/2016 17:00:00
+ */
 import java.util.Random
 
 import scala.collection.mutable.Map
@@ -19,7 +31,9 @@ object SparkMatrixFactorization {
 	}
 
 	// Using SGD to update the W and H matrices
-	def sgd_on_one_block_func(step_size : Float, x_block_dim: Int, y_block_dim: Int, R_rows: Iterable[(Int, Int, Float)], W_rows_in: Iterable[Array[Array[Float]]], H_rows_in: Iterable[Array[Array[Float]]]): Array[Array[Array[Float]]] = {
+	def sgd_on_one_block_func(step_size : Float, x_block_dim: Int, y_block_dim: Int, 
+		R_rows: Iterable[(Int, Int, Float)], W_rows_in: Iterable[Array[Array[Float]]], 
+		H_rows_in: Iterable[Array[Array[Float]]]): Array[Array[Array[Float]]] = {
 		val W_rows: Array[Array[Float]] = W_rows_in.toList(0)
 		val H_rows: Array[Array[Float]] = H_rows_in.toList(0)
 		val result = new ArrayBuffer[Array[Array[Float]]]
@@ -84,7 +98,7 @@ object SparkMatrixFactorization {
 	def main(args: Array[String]) {
 		if (args.length < 4) {
 			System.err.println("Usage: [time] spark-submit --master yarn [--spark-config-params] mf.py {dataset-location} {rank} {output-location-w} {output-location-h}")
-      		System.exit(1)
+				System.exit(1)
 		}
 			
 		val conf = new SparkConf().setAppName("Matrix Factorization")
@@ -97,9 +111,11 @@ object SparkMatrixFactorization {
 		val W_path = args(2)		// W matrix file 
 		val H_path = args(3)		// H matrix file  
 		val N = 4					// Node of every slave
-		val Node_num = 2 			// Num of node
+		val Node_num = 8 			// Num of node
 		val Partition_num = N * Node_num    //Partition num
 		val num_iterations = 10
+
+
 		var eta : Float = 0.001.toFloat
 		val eta_decay : Float = 0.99.toFloat
 
@@ -130,7 +146,7 @@ object SparkMatrixFactorization {
 				val H_block = H_rdd.map{ case(block_id, x) => ((block_id + Partition_num - i - 1) % Partition_num + 1, x)}
 				// Group the rating block, H and W based on block id
 		        // val RWH_union = ratings_block.groupWith(W_rdd, H_block).partitionBy(Partition_num)
-				val RWH_union = ratings_block.groupWith(W_rdd, H_block)
+				val RWH_union = ratings_block.groupWith(W_rdd, H_block).coalesce(Partition_num, shuffle = false)
 
 		        // Update the H and W matrices using SGD, and return updated H and W
 		        val sgd_updates = RWH_union.map{ case(block_id, x) => (block_id, sgd_on_one_block_func(eta, x_block_dim, y_block_dim, x._1, x._2, x._3))}.collect()
@@ -157,7 +173,6 @@ object SparkMatrixFactorization {
 
 		sc.parallelize(W_array).map(x => x.mkString(",")).coalesce(1).saveAsTextFile(W_path)
 		sc.parallelize(H_array).map(x => x.mkString(",")).coalesce(1).saveAsTextFile(H_path)
-		//exit()
 		sc.stop()
 	}
 }

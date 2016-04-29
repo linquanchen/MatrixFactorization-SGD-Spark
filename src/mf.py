@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
-# Author: Linquan Chen
-# E-mail: linquanc@andrew.cmu.edu
+# mf.py - Matrix Factorization using Apache Spark Programming 
+# Author: Linquan Chen <linquanc@andrew.cmu.edu>
+# Author: Yuankun Chang <yuankunc@andrew.cmu.edu>
 # Updated: 09/03/2016 17:00:00
 
-# exmaple command to run:
-# spark-submit --master yarn --executor-memory 10G mf.py ratings_1M.csv 30 w.csv h.csv
+# Usage: [time] spark-submit --master yarn [--spark-config-params] mf.py 
+#        {dataset-location} {rank} {output-location-w} {output-location-h}
+
+# Example: time spark-submit --master yarn mf.py ratings_1M.csv 30 w.csv h.csv
 
 import sys
 import numpy as np
@@ -13,7 +16,6 @@ import random
 import time
 from pyspark import SparkContext
 import pyspark
-#import logging
 
 # Using SGD to update the W and H matrices
 def sgd_on_one_block_func(step_size, x_block_dim, y_block_dim, R_rows, W_rows, H_rows):
